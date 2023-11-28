@@ -30,7 +30,8 @@ public class VideoGrabDemo extends Application {
 
         try {
             // load the FXML resource
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoGrabDemo.fxml"));
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoGrabDemo.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoFX.fxml"));
             // store the root element so that the controllers can use it
             BorderPane rootElement = (BorderPane) loader.load();
 
@@ -42,12 +43,13 @@ public class VideoGrabDemo extends Application {
             primaryStage.show();
 
             // set the proper behavior on closing the application
-            VideoGrabDemoController controller = loader.getController();
-            primaryStage.setOnCloseRequest((new EventHandler<WindowEvent>() {
-                public void handle(WindowEvent we) {
-                    controller.setClosed();
-                }
-            }));
+//            VideoGrabDemoController controller = loader.getController();
+            TestController controller = loader.getController();
+//            primaryStage.setOnCloseRequest((new EventHandler<WindowEvent>() {
+//                public void handle(WindowEvent we) {
+//                    controller.setClosed();
+//                }
+//            }));
         } catch (Exception e) {
             e.printStackTrace();
         }
