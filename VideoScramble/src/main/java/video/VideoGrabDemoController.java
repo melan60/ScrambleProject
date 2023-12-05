@@ -8,16 +8,18 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.*;
+import javafx.scene.paint.Color;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.*;
 import org.opencv.videoio.VideoCapture;
+import org.opencv.core.Core;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 /**
  * The controller for our application, where the application logic is
@@ -42,12 +44,82 @@ public class VideoGrabDemoController
     // a timer for acquiring the video stream
     private ScheduledExecutorService timer;
     // the OpenCV object that realizes the video capture
+    //"http://192.168.1.10:8080/"
     private VideoCapture capture = new VideoCapture();
     // a flag to change the button behavior
     private boolean cameraActive = false;
     // the id of the camera to be used
     // when using apple OS with an associated iphone nearby, 0 will be iphone's cam
     private static int cameraId = 0;
+
+    public int plus_grande_puissance_de_2(int height){
+        int val = 1;
+        int puissance = 0;
+        if(height == 0)
+            return 0;
+        while(val <= height){
+            val = val*2;
+            puissance++;
+        }
+        if(val > height){
+            puissance = puissance-1;
+        }
+        System.out.println("Pow : " + puissance);
+        System.out.println("Calcul pow : " + Math.pow(2,puissance));
+        return (int) Math.pow(2,puissance);
+    }
+
+    public Image crypter(Image image_a_crypter){
+        System.out.println("méthode crypter");
+
+        //choisir r(codé sur 8bit) et s(codé sur 7bit)
+        int r = 10; //décalage
+        int s = 3; //le pas
+
+        //Récupérer la taille de l'image
+        int height = (int) image_a_crypter.getHeight();
+        int width = (int) image_a_crypter.getWidth();
+        System.out.println("Taille : " + height + ", " + width);
+
+        System.out.println("méthode crypter1");
+
+        PixelReader pixelReader = image_a_crypter.getPixelReader(); //Pour lire la couleur du pixel
+        WritableImage new_image = new WritableImage(width, height);
+        PixelWriter pixelWriter = new_image.getPixelWriter(); //pour écrire les pixels
+
+        System.out.println("méthode crypter2");
+
+        int iteration = plus_grande_puissance_de_2(height);
+        System.out.println("itérataion : "+iteration);
+        int currentHeight = height;
+        int sumIteration = iteration;
+
+
+//        while(iteration <= height-1){//boucle sur chaque itération
+//
+//            iteration = plus_grande_puissance_de_2(height-iteration);
+
+        for(int idLigne=0; idLigne < height; idLigne++){ //boucle pour faire toutes les lignes de l'itération
+//        for(int idLigne=height; idLigne > 0; idLigne--){ //boucle pour faire toutes les lignes de l'itération
+//                System.out.println("testtt");
+            if(idLigne==sumIteration){
+                currentHeight = currentHeight - iteration;
+                System.out.println("currentHeight : " + currentHeight);
+                iteration = plus_grande_puissance_de_2(currentHeight);
+                sumIteration += iteration;
+                System.out.println("itérataion : "+iteration);
+            }
+            int newIdLigne = (r + (2 * s + 1) * idLigne) % currentHeight;
+            for(int idColonne = 0; idColonne<width;idColonne++){
+                pixelWriter.setColor(idColonne, newIdLigne, pixelReader.getColor(idColonne, idLigne));
+//                pixelWriter.setPixels(idColonne, newIdLigne, pixelReader.getPixels(idColonne, idLigne, ));
+            }
+        }
+//        }
+        System.out.println("FIN");
+        return new_image;
+//        return null;
+    }
 
     /**
      * The action triggered by pushing the button on the GUI
@@ -63,7 +135,6 @@ public class VideoGrabDemoController
         {
             // start the video capture
             this.capture.open(cameraId);
-
             // is the video stream available?
             if (this.capture.isOpened())
             {
@@ -78,10 +149,17 @@ public class VideoGrabDemoController
                         // effectively grab and process a single frame
                         // note : macbook & iphone 11 : 1080p
                         Mat frame = grabFrame();
-                        // more complex image processing can be called from here 
+                        // more complex image processing can be called from here
                         // convert and show the frame
                         Image imageToShow = mat2Image(frame);
+                        System.out.println("test1");
+
+                        //Méthode pour chiffrer
+                        imageToShow = crypter(imageToShow);
+                        System.out.println("test3");
                         updateImageView(currentFrame, imageToShow);
+                        System.out.println("test4");
+
                         currentFrame.setFitWidth(800);
                         currentFrame.setPreserveRatio(true);
 
