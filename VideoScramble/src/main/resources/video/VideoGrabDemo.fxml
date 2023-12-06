@@ -16,7 +16,10 @@
                 </HBox>
             </bottom>
             <center>
-                <ImageView fx:id="currentFrame"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <ImageView fitHeight="300" fitWidth="600" preserveRatio="true" fx:id="currentFrame"/>
+                    <ImageView fitHeight="300" fitWidth="600" preserveRatio="true" fx:id="currentFrame2"/>
+                </HBox>
             </center>
    <left>
       <Box depth="100" height="100" width="100" BorderPane.alignment="CENTER" />

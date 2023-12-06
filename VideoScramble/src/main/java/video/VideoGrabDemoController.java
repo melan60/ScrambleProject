@@ -43,6 +43,8 @@ public class VideoGrabDemoController
     @FXML
     private ImageView currentFrame;
 
+    @FXML
+    private ImageView currentFrame2;
     // a timer for acquiring the video stream
     private ScheduledExecutorService timer;
     // the OpenCV object that realizes the video capture
@@ -75,6 +77,7 @@ public class VideoGrabDemoController
 
         //Récupérer la taille de l'image
         int height = (int) toCrypt.getHeight();
+
 //        matImage.row(4) // TODO
 //        decrypt = matImage.row(i).copyTo(truc avec le calcul);
 
@@ -152,14 +155,15 @@ public class VideoGrabDemoController
                         // ssing can be called from here
                         // convert and show the frame
                         Image imageToShow = mat2Image(frame);
+                        updateImageView(currentFrame, imageToShow);
 
                         //Méthode pour chiffrer
                         frame = crypter(frame, imageToShow);
                         imageToShow = mat2Image(frame);
-                        updateImageView(currentFrame, imageToShow);
+                        updateImageView(currentFrame2, imageToShow);
 
-                        currentFrame.setFitWidth(800);
-                        currentFrame.setPreserveRatio(true);
+//                        currentFrame.setFitWidth(800);
+//                        currentFrame.setPreserveRatio(true);
 
                     }
                 };
