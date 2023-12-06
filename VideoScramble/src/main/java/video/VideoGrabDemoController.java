@@ -20,6 +20,8 @@ import org.opencv.core.Core;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * The controller for our application, where the application logic is
@@ -44,7 +46,6 @@ public class VideoGrabDemoController
     // a timer for acquiring the video stream
     private ScheduledExecutorService timer;
     // the OpenCV object that realizes the video capture
-    //"http://192.168.1.10:8080/"
     private VideoCapture capture = new VideoCapture();
     // a flag to change the button behavior
     private boolean cameraActive = false;
@@ -52,7 +53,7 @@ public class VideoGrabDemoController
     // when using apple OS with an associated iphone nearby, 0 will be iphone's cam
     private static int cameraId = 0;
 
-    public int plus_grande_puissance_de_2(int height){
+    public int findMaxPowerOfTwo(int height){
         int val = 1;
         int puissance = 0;
         if(height == 0)
@@ -64,61 +65,44 @@ public class VideoGrabDemoController
         if(val > height){
             puissance = puissance-1;
         }
-        System.out.println("Pow : " + puissance);
-        System.out.println("Calcul pow : " + Math.pow(2,puissance));
         return (int) Math.pow(2,puissance);
     }
 
-    public Image crypter(Image image_a_crypter){
-        System.out.println("méthode crypter");
-
+    public Image crypter(Image toCrypt){
         //choisir r(codé sur 8bit) et s(codé sur 7bit)
-        int r = 10; //décalage
-        int s = 3; //le pas
+        int r = 48; //décalage
+        int s = 6; //le pas
 
         //Récupérer la taille de l'image
-        int height = (int) image_a_crypter.getHeight();
-        int width = (int) image_a_crypter.getWidth();
-        System.out.println("Taille : " + height + ", " + width);
+        int height = (int) toCrypt.getHeight();
+        int width = (int) toCrypt.getWidth();
 
-        System.out.println("méthode crypter1");
+        PixelReader pixelReader = toCrypt.getPixelReader(); //Pour lire la couleur du pixel
+        WritableImage cryptedImage = new WritableImage(width, height);
+        PixelWriter pixelWriter = cryptedImage.getPixelWriter(); //pour écrire les pixels
 
-        PixelReader pixelReader = image_a_crypter.getPixelReader(); //Pour lire la couleur du pixel
-        WritableImage new_image = new WritableImage(width, height);
-        PixelWriter pixelWriter = new_image.getPixelWriter(); //pour écrire les pixels
-
-        System.out.println("méthode crypter2");
-
-        int iteration = plus_grande_puissance_de_2(height);
-        System.out.println("itérataion : "+iteration);
+        int iteration = findMaxPowerOfTwo(height);
         int currentHeight = height;
-        int sumIteration = iteration;
+        int sumIteration = 0;
+        int sum = iteration;
 
-
-//        while(iteration <= height-1){//boucle sur chaque itération
-//
-//            iteration = plus_grande_puissance_de_2(height-iteration);
-
-        for(int idLigne=0; idLigne < height; idLigne++){ //boucle pour faire toutes les lignes de l'itération
-//        for(int idLigne=height; idLigne > 0; idLigne--){ //boucle pour faire toutes les lignes de l'itération
-//                System.out.println("testtt");
-            if(idLigne==sumIteration){
+        for(int idLigne=0; idLigne < height; idLigne++){
+            if(idLigne==sum){
                 currentHeight = currentHeight - iteration;
-                System.out.println("currentHeight : " + currentHeight);
-                iteration = plus_grande_puissance_de_2(currentHeight);
+//                System.out.println("currentHeight : " + currentHeight);
                 sumIteration += iteration;
-                System.out.println("itérataion : "+iteration);
+                iteration = findMaxPowerOfTwo(currentHeight);
+                sum += iteration;
+//                System.out.println("itérataion : "+iteration);
             }
-            int newIdLigne = (r + (2 * s + 1) * idLigne) % currentHeight;
+            int newIdLigne = (r + (2 * s + 1) * idLigne) % (iteration);
+            int test = newIdLigne + sumIteration;
+//            System.out.println("newLigne : " + test);
             for(int idColonne = 0; idColonne<width;idColonne++){
-                pixelWriter.setColor(idColonne, newIdLigne, pixelReader.getColor(idColonne, idLigne));
-//                pixelWriter.setPixels(idColonne, newIdLigne, pixelReader.getPixels(idColonne, idLigne, ));
+                pixelWriter.setColor(idColonne, test, pixelReader.getColor(idColonne, idLigne));
             }
         }
-//        }
-        System.out.println("FIN");
-        return new_image;
-//        return null;
+        return cryptedImage;
     }
 
     /**
