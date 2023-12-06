@@ -68,18 +68,19 @@ public class VideoGrabDemoController
         return (int) Math.pow(2,puissance);
     }
 
-    public Image crypter(Image toCrypt){
+    public Mat crypter(Mat matImage, Image toCrypt){
         //choisir r(codé sur 8bit) et s(codé sur 7bit)
         int r = 48; //décalage
-        int s = 6; //le pas
+        int s = 200; //le pas
 
         //Récupérer la taille de l'image
         int height = (int) toCrypt.getHeight();
-        int width = (int) toCrypt.getWidth();
+//        matImage.row(4) // TODO
+//        decrypt = matImage.row(i).copyTo(truc avec le calcul);
 
-        PixelReader pixelReader = toCrypt.getPixelReader(); //Pour lire la couleur du pixel
-        WritableImage cryptedImage = new WritableImage(width, height);
-        PixelWriter pixelWriter = cryptedImage.getPixelWriter(); //pour écrire les pixels
+//        PixelReader pixelReader = toCrypt.getPixelReader(); //Pour lire la couleur du pixel
+//        WritableImage cryptedImage = new WritableImage(width, height);
+//        PixelWriter pixelWriter = cryptedImage.getPixelWriter(); //pour écrire les pixels
 
         int iteration = findMaxPowerOfTwo(height);
         int currentHeight = height;
@@ -98,11 +99,21 @@ public class VideoGrabDemoController
             int newIdLigne = (r + (2 * s + 1) * idLigne) % (iteration);
             int test = newIdLigne + sumIteration;
 //            System.out.println("newLigne : " + test);
-            for(int idColonne = 0; idColonne<width;idColonne++){
-                pixelWriter.setColor(idColonne, test, pixelReader.getColor(idColonne, idLigne));
-            }
+            matImage = swapLines(matImage, idLigne, test);
         }
-        return cryptedImage;
+        return matImage;
+    }
+
+    // Fonction pour échanger deux lignes dans une image
+    private static Mat swapLines(Mat image, int ligne1, int ligne2) {
+        // Extraire les lignes spécifiées
+        Mat ligne1Mat = image.row(ligne1);
+        Mat ligne2Mat = image.row(ligne2);
+
+        // Copier le contenu de la ligne 1 vers la ligne 2 et vice versa
+        ligne1Mat.copyTo(image.row(ligne2));
+//        ligne2Mat.copyTo(image.row(ligne1));
+        return image;
     }
 
     /**
@@ -132,17 +143,20 @@ public class VideoGrabDemoController
                     {
                         // effectively grab and process a single frame
                         // note : macbook & iphone 11 : 1080p
-                        Mat frame = grabFrame();
-                        // more complex image processing can be called from here
+
+
+//                        Mat frame = grabFrame();
+                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
+
+                        // more complex image proce
+                        // ssing can be called from here
                         // convert and show the frame
                         Image imageToShow = mat2Image(frame);
-                        System.out.println("test1");
 
                         //Méthode pour chiffrer
-                        imageToShow = crypter(imageToShow);
-                        System.out.println("test3");
+                        frame = crypter(frame, imageToShow);
+                        imageToShow = mat2Image(frame);
                         updateImageView(currentFrame, imageToShow);
-                        System.out.println("test4");
 
                         currentFrame.setFitWidth(800);
                         currentFrame.setPreserveRatio(true);
