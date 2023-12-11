@@ -4,23 +4,87 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="video.VideoGrabDemoController">
-            <center>
-                <HBox spacing="10" alignment="CENTER">
-                    <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame"/>
-                    <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame2"/>
-                    <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame3"/>
-                </HBox>
-            </center>
-        <bottom>
-            <HBox alignment="center">
-                <padding>
-                    <Insets bottom="25" left="25" right="25" top="25" />
-                </padding>
-                <Button fx:id="button" alignment="center" onAction="#startCamera" text="Start" />
+<BorderPane minHeight="600" minWidth="400" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="video.VideoGrabDemoController">
+    <top>
+        <VBox spacing="10" alignment="CENTER">
+            <padding>
+                <Insets bottom="25" left="25" right="25" top="25" />
+            </padding>
+            <HBox spacing="10" alignment="CENTER">
+                <ToggleButton text="Webcam" onAction="#toggleWebcam"/>
+                <ToggleButton text="Fichier" onAction="#toggleFile"/>
             </HBox>
-        </bottom>
+            <HBox alignment="CENTER">
+                <VBox spacing="10" alignment="CENTER" visible="false" fx:id="valueFields">
+                    <Label text="r :" />
+                    <TextField fx:id="valueR"/>
+                    <Label text="s:" />
+                    <TextField fx:id="valueS" />
+                    <Button fx:id="buttonFile" text="Parcourir" onAction="#browseFile" visible="false"/>
+                    <Button fx:id="buttonWebcam" text="Start Webcam" onAction="#startCamera" visible="false"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
 
+    <center>
+        <HBox spacing="10" alignment="CENTER">
+            <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame"/>
+            <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame2"/>
+            <ImageView fitHeight="250" fitWidth="500" preserveRatio="true" fx:id="currentFrame3"/>
+            <padding>
+                <Insets bottom="200" />
+            </padding>
+        </HBox>
+    </center>
 </BorderPane>
+
+
+
+
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+
+<!--<?import javafx.geometry.*?>-->
+<!--<?import javafx.scene.control.*?>-->
+<!--<?import javafx.scene.image.*?>-->
+<!--<?import javafx.scene.layout.*?>-->
+
+<!--<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="video.VideoGrabDemoController">-->
+<!--    <center>-->
+<!--        <HBox spacing="10" alignment="CENTER">-->
+<!--            <VBox spacing="10" alignment="CENTER">-->
+<!--                <ToggleButton text="Webcam" onAction="#toggleWebcam"/>-->
+<!--                <VBox fx:id="webcamFields" spacing="5" alignment="CENTER" managed="false" visible="false">-->
+<!--                    <Label text="Valeur 1:" />-->
+<!--                    <TextField fx:id="webcamValue1Field" />-->
+<!--                    <Label text="Valeur 2:" />-->
+<!--                    <TextField fx:id="webcamValue2Field" />-->
+<!--                    <Button text="Start Webcam" />-->
+<!--                </VBox>-->
+<!--            </VBox>-->
+
+<!--            <VBox spacing="10" alignment="CENTER">-->
+<!--                <ToggleButton text="Fichier" onAction="#toggleFile"/>-->
+<!--                <VBox fx:id="fileFields" spacing="5" alignment="CENTER" managed="false" visible="false">-->
+<!--                    <Label text="Chemin du fichier:" />-->
+<!--                    <TextField fx:id="filePathField" />-->
+<!--                    <Button text="Parcourir" />-->
+<!--                </VBox>-->
+<!--            </VBox>-->
+<!--        </HBox>-->
+<!--    </center>-->
+
+<!--    &lt;!&ndash; Le reste du code reste inchangé &ndash;&gt;-->
+<!--    <bottom>-->
+<!--        <HBox alignment="CENTER">-->
+<!--            <padding>-->
+<!--                <Insets bottom="25" left="25" right="25" top="25" />-->
+<!--            </padding>-->
+<!--            <Button fx:id="button" alignment="CENTER" onAction="#startCamera" text="Start" style="-fx-font-size: 14pt;" />-->
+<!--        </HBox>-->
+<!--    </bottom>-->
+<!--</BorderPane>-->
+
+
+

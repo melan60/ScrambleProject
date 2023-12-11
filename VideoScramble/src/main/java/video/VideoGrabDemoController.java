@@ -1,27 +1,28 @@
 package video;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.*;
 import org.opencv.videoio.VideoCapture;
-import org.opencv.core.Core;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.TextField;
 
 /**
  * The controller for our application, where the application logic is
@@ -36,15 +37,29 @@ import javafx.scene.image.ImageView;
  */
 public class VideoGrabDemoController
 {
+    @FXML
+    private VBox valueFields;
+
+    @FXML
+    private TextField valueR;
+
+    @FXML
+    private TextField valueS;
+    @FXML
+    private Button buttonFile;
+
     // the FXML button
     @FXML
-    private Button button;
+    private Button buttonWebcam;
     // the FXML image view
     @FXML
     private ImageView currentFrame;
 
     @FXML
     private ImageView currentFrame2;
+
+    @FXML
+    private ImageView currentFrame3;
     // a timer for acquiring the video stream
     private ScheduledExecutorService timer;
     // the OpenCV object that realizes the video capture
@@ -138,6 +153,14 @@ public class VideoGrabDemoController
             {
                 this.cameraActive = true;
 
+                int[] values = checkValues();
+                if(values == null){
+                    this.cameraActive = false;
+                    this.stopAcquisition();
+                    System.out.println("error r & s values");
+                    return;
+                }
+
                 // grab a frame every 33 ms (30 frames/sec)
                 Runnable frameGrabber = new Runnable() {
 
@@ -161,10 +184,7 @@ public class VideoGrabDemoController
                         frame = crypter(frame, imageToShow);
                         imageToShow = mat2Image(frame);
                         updateImageView(currentFrame2, imageToShow);
-
-//                        currentFrame.setFitWidth(800);
-//                        currentFrame.setPreserveRatio(true);
-
+                        updateImageView(currentFrame3, imageToShow);
                     }
                 };
 
@@ -172,7 +192,7 @@ public class VideoGrabDemoController
                 this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
 
                 // update the button content
-                this.button.setText("Stop Camera");
+                this.buttonWebcam.setText("Stop Camera");
             }
             else
             {
@@ -185,11 +205,25 @@ public class VideoGrabDemoController
             // the camera is not active at this point
             this.cameraActive = false;
             // update again the button content
-            this.button.setText("Start Camera");
+            this.buttonWebcam.setText("Start Camera");
 
             // stop the timer
             this.stopAcquisition();
         }
+    }
+
+    public int[] checkValues() {
+        int[] values = new int[2];
+        try {
+            values[0] = Integer.parseInt(this.valueR.getText());
+            values[1] = Integer.parseInt(this.valueS.getText());
+        } catch (NumberFormatException e) {
+            System.out.println(e);
+            return null;
+        }
+        if(values[0] < 0 || values[1] < 0 || values[0] > 255 || values[1] > 127)
+            return null;
+        return values;
     }
 
     /**
@@ -226,6 +260,62 @@ public class VideoGrabDemoController
         }
 
         return frame;
+    }
+
+    @FXML
+    void toggleWebcam() {
+        boolean isSelected = valueFields.isVisible();
+        valueFields.setVisible(!isSelected);
+        valueFields.setManaged(!isSelected);
+
+        boolean isButtonVisible = buttonWebcam.isVisible();
+        buttonWebcam.setVisible(!isButtonVisible);
+    }
+
+    @FXML
+    void toggleFile() {
+        boolean isSelected = valueFields.isVisible();
+        valueFields.setVisible(!isSelected);
+        valueFields.setManaged(!isSelected);
+
+        boolean isButtonVisible = buttonFile.isVisible();
+        buttonFile.setVisible(!isButtonVisible);
+    }
+
+    @FXML
+    void browseFile(ActionEvent event) {
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Media");
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        if(selectedFile != null){
+            String url = selectedFile.toURI().toString();
+
+//            media = new Media(url);
+//            mediaPlayer = new MediaPlayer(media);
+//
+//            mediaView.setMediaPlayer(mediaPlayer);
+//
+//            mediaPlayer.currentTimeProperty().addListener(((observableValue, oldValue, newValue) -> {
+//                slider.setValue(newValue.toSeconds());
+//                lblDuration.setText("Duration: " + (int)slider.getValue() + " / " + (int)media.getDuration().toSeconds());
+//            }));
+//
+//            mediaPlayer.setOnReady(() ->{
+//                Duration totalDuration = media.getDuration();
+//                slider.setMax(totalDuration.toSeconds());
+//                lblDuration.setText("Duration: 00 / " + (int)media.getDuration().toSeconds());
+//            });
+//
+//            Scene scene = mediaView.getScene();
+//            mediaView.fitWidthProperty().bind(scene.widthProperty());
+//            mediaView.fitHeightProperty().bind(scene.heightProperty());
+
+            //mediaPlayer.setAutoPlay(true);
+
+        }
+
     }
 
     /**
