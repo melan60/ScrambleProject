@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.opencv.core.Mat;
@@ -51,6 +52,12 @@ public class VideoGrabDemoController
     // the FXML button
     @FXML
     private Button buttonWebcam;
+
+    @FXML
+    private ToggleButton toggleButtonWebcam;
+
+    @FXML
+    private ToggleButton toggleButtonFile;
     // the FXML image view
     @FXML
     private ImageView currentFrame;
@@ -171,8 +178,8 @@ public class VideoGrabDemoController
                         // note : macbook & iphone 11 : 1080p
 
 
-//                        Mat frame = grabFrame();
-                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
+                        Mat frame = grabFrame();
+//                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
 
                         // more complex image proce
                         // ssing can be called from here
@@ -264,22 +271,22 @@ public class VideoGrabDemoController
 
     @FXML
     void toggleWebcam() {
-        boolean isSelected = valueFields.isVisible();
-        valueFields.setVisible(!isSelected);
-        valueFields.setManaged(!isSelected);
-
-        boolean isButtonVisible = buttonWebcam.isVisible();
-        buttonWebcam.setVisible(!isButtonVisible);
+        toggleButton(buttonWebcam, toggleButtonWebcam, toggleButtonFile, buttonFile);
     }
 
     @FXML
     void toggleFile() {
-        boolean isSelected = valueFields.isVisible();
-        valueFields.setVisible(!isSelected);
-        valueFields.setManaged(!isSelected);
+        toggleButton(buttonFile, toggleButtonFile, toggleButtonWebcam, buttonWebcam);
+    }
 
+    private void toggleButton(Button buttonFile, ToggleButton toggleButtonFile, ToggleButton toggleButtonWebcam, Button buttonWebcam) {
         boolean isButtonVisible = buttonFile.isVisible();
+        valueFields.setVisible(!isButtonVisible);
+        valueFields.setManaged(!isButtonVisible);
+        toggleButtonFile.setSelected(!isButtonVisible);
+        toggleButtonWebcam.setSelected(false);
         buttonFile.setVisible(!isButtonVisible);
+        buttonWebcam.setVisible(false);
     }
 
     @FXML

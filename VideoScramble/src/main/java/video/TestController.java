@@ -14,11 +14,14 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.nio.file.Files;
 
 public class TestController {
 
     @FXML
     private Button btnPlay;
+    @FXML
+    private Button btnSave;
 
     @FXML
     private Label lblDuration;
@@ -32,6 +35,13 @@ public class TestController {
     private MediaPlayer mediaPlayer;
 
     private boolean isPlayed = false;
+
+    @FXML
+    void btnSave(MouseEvent event){
+        String url = media.getSource();
+//        byte[] array = Files.toByteArray(url);
+        System.out.println(url);
+    }
 
     @FXML
     void btnPlay(MouseEvent event) {

@@ -27,6 +27,7 @@
                         <Button mnemonicParsing="false" onAction="#selectMedia" text="Select Media" />
                         <Button fx:id="btnPlay" mnemonicParsing="false" onMouseClicked="#btnPlay" text="Play" />
                         <Button mnemonicParsing="false" onMouseClicked="#btnStop" text="Stop" />
+                        <Button fx:id="btnSave" onMouseClicked="#btnSave" text="Save" />
                         <Label fx:id="lblDuration" text="Duration: 00 / 00" />
                     </children>
                 </HBox>
