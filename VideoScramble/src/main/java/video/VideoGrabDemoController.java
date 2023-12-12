@@ -92,41 +92,69 @@ public class VideoGrabDemoController
         return (int) Math.pow(2,puissance);
     }
 
-    public Mat crypter(Mat matImage, Image toCrypt){
+    public Mat crypter(Mat matImage){
+
         //choisir r(codé sur 8bit) et s(codé sur 7bit)
         int r = 48; //décalage
         int s = 200; //le pas
 
         //Récupérer la taille de l'image
-        int height = (int) toCrypt.getHeight();
-
-//        matImage.row(4) // TODO
-//        decrypt = matImage.row(i).copyTo(truc avec le calcul);
-
-//        PixelReader pixelReader = toCrypt.getPixelReader(); //Pour lire la couleur du pixel
-//        WritableImage cryptedImage = new WritableImage(width, height);
-//        PixelWriter pixelWriter = cryptedImage.getPixelWriter(); //pour écrire les pixels
+        int height = matImage.height();
 
         int iteration = findMaxPowerOfTwo(height);
         int currentHeight = height;
         int sumIteration = 0;
         int sum = iteration;
+        int newIdLigne;
 
         for(int idLigne=0; idLigne < height; idLigne++){
             if(idLigne==sum){
                 currentHeight = currentHeight - iteration;
-//                System.out.println("currentHeight : " + currentHeight);
                 sumIteration += iteration;
                 iteration = findMaxPowerOfTwo(currentHeight);
                 sum += iteration;
-//                System.out.println("itérataion : "+iteration);
             }
-            int newIdLigne = (r + (2 * s + 1) * idLigne) % (iteration);
+            newIdLigne = (r + (2 * s + 1) * idLigne) % (iteration);
             int test = newIdLigne + sumIteration;
-//            System.out.println("newLigne : " + test);
-            matImage = swapLines(matImage, idLigne, test);
+            //matImage.row(idLigne).copyTo(matImage.row(test)); //POur enlever la méthode
+            matImage = swapLines(matImage, idLigne, test); // TODO decrypt = matImage.row(i).copyTo(truc avec le calcul);
         }
         return matImage;
+    }
+
+    //Je connais test et Je cherche idLigne
+    // newIdLigne = test - sum itération
+    //Or sumIteration = findMaxPowerOfTwo(height)
+
+    public Mat decrypter(Mat matImageToDecrypt){
+
+        //choisir r(codé sur 8bit) et s(codé sur 7bit) à récupérer et vérifier les valeurs
+        int r = 48; //décalage
+        int s = 200; //le pas
+
+        //Récupérer la taille de l'image
+        int height = matImageToDecrypt.height();
+
+        int iteration = findMaxPowerOfTwo(height);
+        int currentHeight = height;
+        int sumIteration = 0;
+        int sum = iteration;
+        int newIdLigne;
+
+        //Pour boucler sur chaque lignes
+        for(int idLigne=0; idLigne < height; idLigne++){
+            if(idLigne==sum){
+                currentHeight = currentHeight - iteration;
+                sumIteration += iteration;
+                iteration = findMaxPowerOfTwo(currentHeight);
+                sum += iteration;
+            }
+            newIdLigne = (r + (2 * s + 1) * idLigne) % (iteration);
+            int test = newIdLigne + sumIteration;
+            //matImage.row(idLigne).copyTo(matImage.row(test)); //POur enlever la méthode
+            matImageToDecrypt = swapLines(matImageToDecrypt, idLigne, test); // TODO decrypt = matImage.row(i).copyTo(truc avec le calcul);
+        }
+        return matImageToDecrypt;
     }
 
     // Fonction pour échanger deux lignes dans une image
@@ -178,8 +206,9 @@ public class VideoGrabDemoController
                         // note : macbook & iphone 11 : 1080p
 
 
-                        Mat frame = grabFrame();
+//                        Mat frame = grabFrame();
 //                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
+                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
 
                         // more complex image proce
                         // ssing can be called from here
@@ -188,10 +217,16 @@ public class VideoGrabDemoController
                         updateImageView(currentFrame, imageToShow);
 
                         //Méthode pour chiffrer
-                        frame = crypter(frame, imageToShow);
+                        frame = crypter(frame);
                         imageToShow = mat2Image(frame);
                         updateImageView(currentFrame2, imageToShow);
                         updateImageView(currentFrame3, imageToShow);
+
+                        frame = decrypter(frame);
+                        imageToShow = mat2Image(frame);
+                        updateImageView(currentFrame3, imageToShow);
+
+
                     }
                 };
 
