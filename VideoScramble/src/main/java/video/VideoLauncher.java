@@ -1,6 +1,5 @@
 package video;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -8,12 +7,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 
 
-import javafx.stage.WindowEvent;
-import org.opencv.videoio.VideoCapture;
 import org.opencv.core.Core;
-import video.VideoGrabDemoController;
-
-import java.io.InputStream;
 
 /**
  * Gère le lancement de l'application
@@ -24,13 +18,18 @@ import java.io.InputStream;
  *
  */
 
-public class VideoGrabDemo extends Application {
+public class VideoLauncher extends Application {
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
     @Override
+    /**
+     * Lance l'application
+     * @param primaryStage la fenêtre principale
+     * @throws Exception si l'application ne peut pas être lancée
+     */
     public void start(Stage primaryStage) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoGrabDemo.fxml"));
@@ -42,12 +41,16 @@ public class VideoGrabDemo extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            VideoGrabDemoController controller = loader.getController();
+            VideoController controller = loader.getController();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Lance l'application
+     * @param args les arguments de la ligne de commande
+     */
     public static void main(String[] args) {
         launch(args);
     }

@@ -10,7 +10,13 @@ import org.opencv.core.Mat;
  * @group S5-A1
  *
  */
+
 public class VideoCrypt {
+    /**
+     * Trouve la puissance de 2 la plus proche de la hauteur de l'image
+     * @param height hauteur de l'image
+     * @return la valeur de la puissance de 2 la plus proche de la hauteur de l'image
+     */
     public int findMaxPowerOfTwo(int height){
         int val = 1;
         int puissance = 0;
@@ -26,6 +32,13 @@ public class VideoCrypt {
         return (int) Math.pow(2,puissance);
     }
 
+    /**
+     * Echange deux lignes d'une matrice
+     * @param mat matrice
+     * @param line1 une ligne à échanger avec la seconde
+     * @param line2 une ligne à échanger avec la première
+     * @return la matrice avec les lignes échangées
+     */
     private static Mat swapLines(Mat mat, int line1, int line2) {
         Mat temp = mat.row(line1).clone();
         mat.row(line2).copyTo(mat.row(line1));
@@ -33,6 +46,13 @@ public class VideoCrypt {
         return mat;
     }
 
+    /**
+     * Crypte l'image
+     * @param matImage image à crypter
+     * @param r décalage
+     * @param s pas
+     * @return l'image cryptée
+     */
     public Mat crypter(Mat matImage, int r, int s){
         int height = matImage.height();
 
@@ -55,6 +75,13 @@ public class VideoCrypt {
         return matImage;
     }
 
+    /**
+     * Décrypte l'image
+     * @param matImageToDecrypt image à décrypter
+     * @param r décalage
+     * @param s pas
+     * @return l'image décryptée
+     */
     public Mat decrypter(Mat matImageToDecrypt, int r, int s){
         int height = matImageToDecrypt.height();
 

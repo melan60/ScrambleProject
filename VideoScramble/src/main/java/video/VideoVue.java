@@ -24,6 +24,12 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class VideoVue {
+    /**
+     * Regarde si les valeurs entrées dans les champs de texte sont correctes
+     * @param r décalage
+     * @param s pas
+     * @return
+     */
     public int[] checkValues(TextField r,TextField s) {
         int[] values = new int[2];
         try {
