@@ -12,7 +12,7 @@
                 <Insets bottom="25" left="25" right="25" top="25" />
             </padding>
             <HBox alignment="CENTER">
-                <Label text="Veuillez indiquer les valeurs r et s (sur je sais plus combien de bit)"/>
+                <Label text="Veuillez indiquer les valeurs r (sur 8 bits) et s (sur 7 bits)"/>
             </HBox>
             <HBox spacing="10" alignment="CENTER">
                 <Button text="Webcam" onAction="#toggleWebcam" fx:id="toggleButtonWebcam"/>
@@ -44,7 +44,6 @@
                     <fx:define>
                         <ToggleGroup fx:id="group"/>
                     </fx:define>
-
                     <RadioButton fx:id="crypt" text="Crypter" toggleGroup="$group" selected="true"></RadioButton>
 
                     <RadioButton fx:id="decrypt" text="Decrypter" toggleGroup="$group"></RadioButton>
@@ -55,7 +54,7 @@
             </HBox>
 
             <HBox alignment="CENTER">
-                    <Button fx:id="buttonWebcam" text="Démarrer la Webcam" onAction="#startCamera" visible="true"/>
+                    <Button fx:id="buttonAction" text="Démarrer la Webcam" onAction="#launchApp" visible="true"/>
             </HBox>
         </VBox>
     </top>

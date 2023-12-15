@@ -32,17 +32,9 @@ public class VideoGrabDemo extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
-        //VideoCapture capture = new VideoCapture(0); // 0 indique la première webcam
-        //Mat frame = new Mat();
-
         try {
-            // load the FXML resource
             FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoGrabDemo.fxml"));
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("VideoFX.fxml"));
-            // store the root element so that the controllers can use it
             BorderPane rootElement = (BorderPane) loader.load();
-
 
             Scene scene = new Scene(rootElement, 1200, 800);
 
@@ -50,23 +42,14 @@ public class VideoGrabDemo extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            // set the proper behavior on closing the application
             VideoGrabDemoController controller = loader.getController();
-//            TestController controller = loader.getController();
-//            primaryStage.setOnCloseRequest((new EventHandler<WindowEvent>() {
-//                public void handle(WindowEvent we) {
-//                    controller.setClosed();
-//                }
-//            }));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-
 }
 
