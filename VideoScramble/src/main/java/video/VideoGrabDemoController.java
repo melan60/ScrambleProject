@@ -70,6 +70,8 @@ public class VideoGrabDemoController
 
     @FXML
     private ImageView currentFrame3;
+    private VideoCrypt videoCrypt = new VideoCrypt();
+    private VideoVue videoVue = new VideoVue();
     private VideoWriter videoWriter;
     // a timer for acquiring the video stream
     private ScheduledExecutorService timer;
@@ -81,93 +83,8 @@ public class VideoGrabDemoController
     // when using apple OS with an associated iphone nearby, 0 will be iphone's cam
     private static int cameraId = 0;
 
-    public int findMaxPowerOfTwo(int height){
-        int val = 1;
-        int puissance = 0;
-        if(height == 0)
-            return 0;
-        while(val <= height){
-            val = val*2;
-            puissance++;
-        }
-        if(val > height){
-            puissance = puissance-1;
-        }
-        return (int) Math.pow(2,puissance);
-    }
-
-    public Mat crypter(Mat matImage){
-        int r = 27; //décalage
-        int s = 154; //le pas
-        int height = matImage.height();
-
-        int maxPowerOfTwo = findMaxPowerOfTwo(height);
-        int currentHeight = height;
-        int sumIteration = 0;
-        int sumLinesUsed = maxPowerOfTwo;
-        int newIdLigne;
-
-        for(int idLigne=0; idLigne < height; idLigne++){
-            if(idLigne==sumLinesUsed){
-                currentHeight = currentHeight - maxPowerOfTwo;
-                sumIteration += maxPowerOfTwo;
-                maxPowerOfTwo = findMaxPowerOfTwo(currentHeight);
-                sumLinesUsed += maxPowerOfTwo;
-            }
-            newIdLigne = ((r + (2 * s + 1) * idLigne) % maxPowerOfTwo) + sumIteration;
-            matImage = swapLines(matImage, newIdLigne, idLigne);
-        }
-        return matImage;
-    }
 
 
-    public Mat decrypter(Mat matImageToDecrypt){
-
-        //choisir r(codé sur 8bit) et s(codé sur 7bit) à récupérer et vérifier les valeurs
-        int r = 27; //décalage
-        int s = 154; //le pas
-
-        //Récupérer la taille de l'image
-        int height = matImageToDecrypt.height();
-        System.out.println("height : " + height);
-
-        int iteration = findMaxPowerOfTwo(height);
-        int fixedIteration = iteration;
-        int currentHeight = height;
-        int sumIteration = 0;
-        int idLigne;
-        int previousIdLigne = -1;
-
-        while(iteration != 0){
-            idLigne = iteration-1;
-            iteration--;
-            previousIdLigne = ((r + (2 * s + 1) * idLigne) % fixedIteration) + sumIteration;
-            System.out.println("decrypt, previousIdLigne : " + previousIdLigne + ", idLigne : " + (idLigne+sumIteration) + ", sumIteration : " + sumIteration + ", iteration : " + iteration + ", fixedIteration : " + fixedIteration);
-            matImageToDecrypt = swapLines(matImageToDecrypt, (idLigne+sumIteration), previousIdLigne);
-            if(iteration == 0){
-                currentHeight = currentHeight - fixedIteration;
-                sumIteration += fixedIteration;
-                iteration = findMaxPowerOfTwo(currentHeight);
-                System.out.println("ite : " + iteration);
-                fixedIteration = iteration;
-                if(iteration == 1 || iteration == 0) {
-                    break;
-                }
-            }
-        }
-
-
-        return matImageToDecrypt;
-    }
-
-    private static Mat swapLines(Mat mat, int line1, int line2) {
-//        Mat temp = new Mat();
-//        mat.row(line1).copyTo(temp);
-        Mat temp = mat.row(line1).clone();
-        mat.row(line2).copyTo(mat.row(line1));
-        temp.copyTo(mat.row(line2));
-        return mat;
-    }
 
     /**
      * The action triggered by pushing the button on the GUI
@@ -187,10 +104,11 @@ public class VideoGrabDemoController
 
                 this.videoWriter = new VideoWriter("output.mp4", VideoWriter.fourcc('X', '2', '6', '4'), 30, frameSize);
                 System.out.println(videoWriter.isOpened());
-                int[] values = checkValues();
+
+                int[] values = videoVue.checkValues(this.valueR,this.valueS);
                 if(values == null){
                     this.cameraActive = false;
-                    this.stopAcquisition();
+                    videoVue.stopAcquisition(this.timer, this.capture, this.videoWriter);
                     System.out.println("error r & s values");
                     return;
                 }
@@ -198,22 +116,22 @@ public class VideoGrabDemoController
                 Runnable frameGrabber = new Runnable() {
                     @Override
                     public void run() {
-                        Mat frame = grabFrame();
+//                        Mat frame = videoVue.grabFrame(this.capture);
 //                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
                         Mat cryptedFrame;
-//                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
+                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
 
-                        Image imageToShow = mat2Image(frame);
-                        updateImageView(currentFrame, imageToShow);
+                        Image imageToShow = videoVue.mat2Image(frame);
+                        videoVue.updateImageView(currentFrame, imageToShow);
 
                         //Méthode pour chiffrer
-                        cryptedFrame = crypter(frame);
-                        imageToShow = mat2Image(cryptedFrame);
-                        updateImageView(currentFrame2, imageToShow);
+                        cryptedFrame = videoCrypt.crypter(frame);
+                        imageToShow = videoVue.mat2Image(cryptedFrame);
+                        videoVue.updateImageView(currentFrame2, imageToShow);
 
-                        frame = decrypter(cryptedFrame);
-                        imageToShow = mat2Image(frame);
-                        updateImageView(currentFrame3, imageToShow);
+                        frame = videoCrypt.decrypter(cryptedFrame);
+                        imageToShow = videoVue.mat2Image(frame);
+                        videoVue.updateImageView(currentFrame3, imageToShow);
 
                         if (videoWriter.isOpened()) {
                             videoWriter.write(frame);
@@ -238,49 +156,8 @@ public class VideoGrabDemoController
             this.buttonWebcam.setText("Start Camera");
 
             // stop the timer
-            this.stopAcquisition();
+            videoVue.stopAcquisition(this.timer, this.capture, this.videoWriter);
         }
-    }
-
-    public int[] checkValues() {
-        int[] values = new int[2];
-        try {
-            values[0] = Integer.parseInt(this.valueR.getText());
-            values[1] = Integer.parseInt(this.valueS.getText());
-        } catch (NumberFormatException e) {
-            System.out.println(e);
-            return null;
-        }
-        if(values[0] < 0 || values[1] < 0 || values[0] > 255 || values[1] > 127)
-            return null;
-        return values;
-    }
-
-    /**
-     * Get a frame from the opened video stream (if any)
-     *
-     * @return the {@link Mat} to show
-     */
-    private Mat grabFrame() {
-        // init everything
-        Mat frame = new Mat();
-        // check if the capture is open
-        if (this.capture.isOpened()) {
-            try {
-                // read the current frame
-                this.capture.read(frame);
-                // if the frame is not empty, process it
-                if (!frame.empty()) {
-                    // basic single frame processing can be performed here
-                    // TODO ?
-                }
-            }
-            catch (Exception e) {
-                // log the error
-                System.err.println("Exception during the image elaboration: " + e);
-            }
-        }
-        return frame;
     }
 
     @FXML
@@ -338,99 +215,4 @@ public class VideoGrabDemoController
         }
 
     }
-
-    /**
-     * Stop the acquisition from the camera and release all the resources
-     */
-    private void stopAcquisition() {
-        if (this.timer!=null && !this.timer.isShutdown()) {
-            try {
-                // stop the timer
-                this.timer.shutdown();
-                this.timer.awaitTermination(33, TimeUnit.MILLISECONDS);
-            }
-            catch (InterruptedException e) {
-                // log any exception
-                System.err.println("Exception in stopping the frame capture, trying to release the camera now... " + e);
-            }
-        }
-        if (this.capture.isOpened()) {
-            // release the camera
-            this.capture.release();
-        }
-
-        // Stop the VideoWriter
-        if (this.videoWriter.isOpened()) {
-            this.videoWriter.release();
-        }
-    }
-
-    /**
-     * Update the {@link ImageView} in the JavaFX main thread
-     *
-     * @param view
-     *            the {@link ImageView} to update
-     * @param image
-     *            the {@link Image} to show
-     */
-    private void updateImageView(ImageView view, Image image) {
-        onFXThread(view.imageProperty(), image);
-    }
-
-    /**
-     * Convert a Mat object (OpenCV) in the corresponding Image for JavaFX
-     *
-     * @param frame
-     *            the {@link Mat} representing the current frame
-     * @return the {@link Image} to show
-     */
-    public static Image mat2Image(Mat frame) {
-        try {
-            return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
-        }
-        catch (Exception e) {
-            System.err.println("Cannot convert the Mat obejct: " + e);
-            return null;
-        }
-    }
-
-    /**
-     * @param original
-     *            the {@link Mat} object in BGR or grayscale
-     * @return the corresponding {@link BufferedImage}
-     */
-    private static BufferedImage matToBufferedImage(Mat original) {
-        // init
-        BufferedImage image = null;
-        int width = original.width(), height = original.height(), channels = original.channels();
-        byte[] sourcePixels = new byte[width * height * channels];
-        original.get(0, 0, sourcePixels);
-
-        if (original.channels() > 1) {
-            image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-        }
-        else {
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        }
-        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-        System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
-
-        return image;
-    }
-
-    /**
-     * Generic method for putting element running on a non-JavaFX thread on the
-     * JavaFX thread, to properly update the UI
-     *
-     * @param property
-     *            a {@link ObjectProperty}
-     * @param value
-     *            the value to set for the given {@link ObjectProperty}
-     */
-    public static <T> void onFXThread(final ObjectProperty<T> property, final T value) {
-        Platform.runLater(() -> {
-            property.set(value);
-        });
-    }
-
 }
