@@ -2,6 +2,14 @@ package video;
 
 import org.opencv.core.Mat;
 
+/**
+ * Classe contenant les méthodes liées au cryptage et au décryptage
+ *
+ * @author Messaline BEAUDRU
+ * @author Mélanie BENOIT
+ * @group S5-A1
+ *
+ */
 public class VideoCrypt {
     public int findMaxPowerOfTwo(int height){
         int val = 1;

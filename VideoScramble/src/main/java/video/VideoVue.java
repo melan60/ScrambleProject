@@ -15,6 +15,14 @@ import java.awt.image.DataBufferByte;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Classe regroupant les méthodes basiques d'OpenCV
+ *
+ * @author Messaline BEAUDRU
+ * @author Mélanie BENOIT
+ * @group S5-A1
+ *
+ */
 public class VideoVue {
     public int[] checkValues(TextField r,TextField s) {
         int[] values = new int[2];
@@ -35,7 +43,7 @@ public class VideoVue {
      *
      * @return the {@link Mat} to show
      */
-    private Mat grabFrame(VideoCapture capture) {
+    public Mat grabFrame(VideoCapture capture) {
         // init everything
         Mat frame = new Mat();
         // check if the capture is open

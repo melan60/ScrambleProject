@@ -29,14 +29,12 @@ import org.opencv.videoio.VideoWriter;
 import org.opencv.videoio.Videoio;
 
 /**
- * The controller for our application, where the application logic is
- * implemented. It handles the button for starting/stopping the camera and the
- * acquired video stream.
+ * Le controleur de notre application qui s'occupe de l'entièreté
+ * des actions.
  *
- * @author <a href="mailto:luigi.derussis@polito.it">Luigi De Russis</a>
- * @author <a href="http://max-z.de">Maximilian Zuleger</a> (minor fixes)
- * @version 2.0 (2016-09-17)
- * @since 1.0 (2013-10-20)
+ * @author Messaline BEAUDRU
+ * @author Mélanie BENOIT
+ * @group S5-A1
  *
  */
 public class VideoGrabDemoController
@@ -96,7 +94,7 @@ public class VideoGrabDemoController
                 this.cameraActive = true;
                 Size frameSize = new Size(this.capture.get(Videoio.CAP_PROP_FRAME_WIDTH), this.capture.get(Videoio.CAP_PROP_FRAME_HEIGHT));
 
-                this.videoWriter = new VideoWriter("output.mp4", VideoWriter.fourcc('X', '2', '6', '4'), 30, frameSize);
+                this.videoWriter = new VideoWriter("webcam.mp4", VideoWriter.fourcc('X', '2', '6', '4'), 30, frameSize);
                 System.out.println(videoWriter.isOpened());
 
                 int[] values = videoVue.checkValues(this.valueR,this.valueS);
@@ -111,9 +109,9 @@ public class VideoGrabDemoController
                     @Override
                     public void run() {
 //                        Mat frame = videoVue.grabFrame(this.capture);
-//                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
+                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
                         Mat cryptedFrame;
-                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
+//                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
 
                         Image imageToShow = videoVue.mat2Image(frame);
                         videoVue.updateImageView(currentFrame, imageToShow);
@@ -129,7 +127,6 @@ public class VideoGrabDemoController
 
                         if (videoWriter.isOpened()) {
                             videoWriter.write(frame);
-                            System.out.println("osopja");
                         }
                     }
                 };
@@ -178,8 +175,7 @@ public class VideoGrabDemoController
             String url = selectedFile.getAbsolutePath();
             System.out.println(url);
             // start the video capture
-            this.capture.open("resources/video.mp4");
-            System.out.println(this.capture.isOpened());
+            this.capture.open(url);
             if (this.capture.isOpened()) {
                 Size frameSize = new Size(this.capture.get(Videoio.CAP_PROP_FRAME_WIDTH), this.capture.get(Videoio.CAP_PROP_FRAME_HEIGHT));
 
@@ -200,8 +196,9 @@ public class VideoGrabDemoController
 //                        Mat frame = videoVue.grabFrame(this.capture);
 //                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
                         Mat cryptedFrame;
-                        Mat frame = Imgcodecs.imread("/resources/video/yoda.jpg");
-
+//                        Mat frame = Imgcodecs.imread("/resources/video/yoda.jpg");
+                        Mat frame = new Mat();
+                        capture.read(frame);
                         Image imageToShow = videoVue.mat2Image(frame);
                         videoVue.updateImageView(currentFrame, imageToShow);
 
@@ -216,19 +213,18 @@ public class VideoGrabDemoController
 
                         if (videoWriter.isOpened()) {
                             videoWriter.write(frame);
-                            System.out.println("osopja");
+                        }
+                        if(frame.empty()){
+                            videoVue.stopAcquisition(timer, capture, videoWriter);
                         }
                     }
                 };
                 this.timer = Executors.newSingleThreadScheduledExecutor();
                 this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
-                // update the button content
-                this.buttonWebcam.setText("Stop Camera");
             } else {
                 // log the error
                 System.err.println("Impossible to open the file connection...");
             }
-
         }
     }
 }

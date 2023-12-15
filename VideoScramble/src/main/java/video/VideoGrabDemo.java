@@ -15,6 +15,14 @@ import video.VideoGrabDemoController;
 
 import java.io.InputStream;
 
+/**
+ * Gère le lancement de l'application
+ *
+ * @author Messaline BEAUDRU
+ * @author Mélanie BENOIT
+ * @group S5-A1
+ *
+ */
 
 public class VideoGrabDemo extends Application {
 
