@@ -11,19 +11,51 @@
             <padding>
                 <Insets bottom="25" left="25" right="25" top="25" />
             </padding>
-            <HBox spacing="10" alignment="CENTER">
-                <ToggleButton text="Webcam" onAction="#toggleWebcam" fx:id="toggleButtonWebcam"/>
-                <ToggleButton text="Fichier" onAction="#toggleFile" fx:id="toggleButtonFile"/>
-            </HBox>
             <HBox alignment="CENTER">
-                <VBox spacing="10" alignment="CENTER" visible="false" fx:id="valueFields">
-                    <Label text="r :" />
-                    <TextField fx:id="valueR"/>
-                    <Label text="s:" />
-                    <TextField fx:id="valueS" />
-                    <Button fx:id="buttonFile" text="Parcourir" onAction="#browseFile" visible="false"/>
-                    <Button fx:id="buttonWebcam" text="Start Webcam" onAction="#startCamera" visible="false"/>
+                <Label text="Veuillez indiquer les valeurs r et s (sur je sais plus combien de bit)"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER">
+                <Button text="Webcam" onAction="#toggleWebcam" fx:id="toggleButtonWebcam"/>
+                <Button text="Fichier" onAction="#toggleFile" fx:id="toggleButtonFile"/>
+                <padding>
+                    <Insets bottom="20"/>
+                </padding>
+            </HBox>
+
+            <HBox alignment="CENTER">
+                <VBox fx:id="vboxRs" alignment="CENTER" spacing="10">
+                    <HBox spacing="10">
+                        <Label text="r :" />
+                        <TextField fx:id="valueR"/>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <Label text="s :" />
+                        <TextField fx:id="valueS" />
+                    </HBox>
                 </VBox>
+                <padding>
+                    <Insets bottom="20"/>
+                </padding>
+            </HBox>
+
+            <HBox alignment="CENTER">
+                <VBox fx:id="vboxRadioButton" spacing="5" visible="false">
+                    <fx:define>
+                        <ToggleGroup fx:id="group"/>
+                    </fx:define>
+
+                    <RadioButton fx:id="crypt" text="Crypter" toggleGroup="$group" selected="true"></RadioButton>
+
+                    <RadioButton fx:id="decrypt" text="Decrypter" toggleGroup="$group"></RadioButton>
+                </VBox>
+                <padding>
+                    <Insets bottom="20"/>
+                </padding>
+            </HBox>
+
+            <HBox alignment="CENTER">
+                    <Button fx:id="buttonWebcam" text="Démarrer la Webcam" onAction="#startCamera" visible="true"/>
             </HBox>
         </VBox>
     </top>

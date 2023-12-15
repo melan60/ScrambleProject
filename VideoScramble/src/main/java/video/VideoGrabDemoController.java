@@ -42,6 +42,8 @@ import org.opencv.videoio.Videoio;
 public class VideoGrabDemoController
 {
     @FXML
+    private VBox vboxRadioButton;
+    @FXML
     private VBox valueFields;
 
     @FXML
@@ -49,19 +51,11 @@ public class VideoGrabDemoController
 
     @FXML
     private TextField valueS;
-    @FXML
-    private Button buttonFile;
 
     // the FXML button
     @FXML
     private Button buttonWebcam;
 
-    @FXML
-    private ToggleButton toggleButtonWebcam;
-
-    @FXML
-    private ToggleButton toggleButtonFile;
-    // the FXML image view
     @FXML
     private ImageView currentFrame;
 
@@ -117,9 +111,9 @@ public class VideoGrabDemoController
                     @Override
                     public void run() {
 //                        Mat frame = videoVue.grabFrame(this.capture);
-                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
+//                        Mat frame = Imgcodecs.imread("/home/mbenoit/Documents/S5/ProgMedia/ScrambleProject/VideoScramble/src/main/resources/video/yoda.jpg");
                         Mat cryptedFrame;
-//                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
+                        Mat frame = Imgcodecs.imread("/home/mbeaudru/ecole/S5/Perrot/Projet/yoda1.png");
 
                         Image imageToShow = videoVue.mat2Image(frame);
                         videoVue.updateImageView(currentFrame, imageToShow);
@@ -162,23 +156,16 @@ public class VideoGrabDemoController
 
     @FXML
     void toggleWebcam() {
-        toggleButton(buttonWebcam, toggleButtonWebcam, toggleButtonFile, buttonFile);
+        buttonWebcam.setText("Démarrer la Webcam");
+        vboxRadioButton.setVisible(false);
     }
 
     @FXML
     void toggleFile() {
-        toggleButton(buttonFile, toggleButtonFile, toggleButtonWebcam, buttonWebcam);
+        buttonWebcam.setText("Parcourir");
+        vboxRadioButton.setVisible(true);
     }
 
-    private void toggleButton(Button buttonFile, ToggleButton toggleButtonFile, ToggleButton toggleButtonWebcam, Button buttonWebcam) {
-        boolean isButtonVisible = buttonFile.isVisible();
-        valueFields.setVisible(!isButtonVisible);
-        valueFields.setManaged(!isButtonVisible);
-        toggleButtonFile.setSelected(!isButtonVisible);
-        toggleButtonWebcam.setSelected(false);
-        buttonFile.setVisible(!isButtonVisible);
-        buttonWebcam.setVisible(false);
-    }
 
     @FXML
     void browseFile(ActionEvent event) {
@@ -192,8 +179,8 @@ public class VideoGrabDemoController
             System.out.println(url);
             // start the video capture
             this.capture.open("resources/video.mp4");
+            System.out.println(this.capture.isOpened());
             if (this.capture.isOpened()) {
-                this.cameraActive = true;
                 Size frameSize = new Size(this.capture.get(Videoio.CAP_PROP_FRAME_WIDTH), this.capture.get(Videoio.CAP_PROP_FRAME_HEIGHT));
 
                 this.videoWriter = new VideoWriter("output.mp4", VideoWriter.fourcc('X', '2', '6', '4'), 30, frameSize);
@@ -239,7 +226,7 @@ public class VideoGrabDemoController
                 this.buttonWebcam.setText("Stop Camera");
             } else {
                 // log the error
-                System.err.println("Impossible to open the camera connection...");
+                System.err.println("Impossible to open the file connection...");
             }
 
         }
