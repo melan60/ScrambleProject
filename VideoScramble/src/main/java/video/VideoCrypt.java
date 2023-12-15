@@ -27,17 +27,13 @@ public class VideoCrypt {
     }
 
     private static Mat swapLines(Mat mat, int line1, int line2) {
-//        Mat temp = new Mat();
-//        mat.row(line1).copyTo(temp);
         Mat temp = mat.row(line1).clone();
         mat.row(line2).copyTo(mat.row(line1));
         temp.copyTo(mat.row(line2));
         return mat;
     }
 
-    public Mat crypter(Mat matImage){
-        int r = 27; //décalage
-        int s = 154; //le pas
+    public Mat crypter(Mat matImage, int r, int s){
         int height = matImage.height();
 
         int maxPowerOfTwo = findMaxPowerOfTwo(height);
@@ -59,15 +55,8 @@ public class VideoCrypt {
         return matImage;
     }
 
-    public Mat decrypter(Mat matImageToDecrypt){
-
-        //choisir r(codé sur 8bit) et s(codé sur 7bit) à récupérer et vérifier les valeurs
-        int r = 27; //décalage
-        int s = 154; //le pas
-
-        //Récupérer la taille de l'image
+    public Mat decrypter(Mat matImageToDecrypt, int r, int s){
         int height = matImageToDecrypt.height();
-        System.out.println("height : " + height);
 
         int iteration = findMaxPowerOfTwo(height);
         int fixedIteration = iteration;
@@ -80,23 +69,17 @@ public class VideoCrypt {
             idLigne = iteration-1;
             iteration--;
             previousIdLigne = ((r + (2 * s + 1) * idLigne) % fixedIteration) + sumIteration;
-            System.out.println("decrypt, previousIdLigne : " + previousIdLigne + ", idLigne : " + (idLigne+sumIteration) + ", sumIteration : " + sumIteration + ", iteration : " + iteration + ", fixedIteration : " + fixedIteration);
             matImageToDecrypt = swapLines(matImageToDecrypt, (idLigne+sumIteration), previousIdLigne);
             if(iteration == 0){
                 currentHeight = currentHeight - fixedIteration;
                 sumIteration += fixedIteration;
                 iteration = findMaxPowerOfTwo(currentHeight);
-                System.out.println("ite : " + iteration);
                 fixedIteration = iteration;
                 if(iteration == 1 || iteration == 0) {
                     break;
                 }
             }
         }
-
-
         return matImageToDecrypt;
     }
-
-
 }
