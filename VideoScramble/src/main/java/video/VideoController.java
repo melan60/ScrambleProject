@@ -38,7 +38,7 @@ public class VideoController
     @FXML
     private TextField valueS;
     @FXML
-    private ToggleGroup group;
+    private RadioButton crypt;
     @FXML
     private Button buttonAction;
     @FXML
@@ -47,6 +47,8 @@ public class VideoController
     private ImageView currentFrame2;
     @FXML
     private ImageView currentFrame3;
+    @FXML
+    private Label errorValues;
 
     private VideoCrypt videoCrypt = new VideoCrypt();
     private VideoVue videoVue = new VideoVue();
@@ -63,6 +65,7 @@ public class VideoController
      */
     @FXML
     protected void launchApp(ActionEvent event){
+        this.errorValues.setVisible(false);
         if(this.buttonAction.getText().equals("Parcourir") || this.buttonAction.getText().equals("Stop parcourir")){
             if(!this.cameraActive) {
                 FileChooser fileChooser = new FileChooser();
@@ -97,7 +100,7 @@ public class VideoController
         if(this.capture.isOpened()){
             int[] values = videoVue.checkValues(this.valueR,this.valueS);
             if(values == null){
-                // TODO message d'erreur
+                this.errorValues.setVisible(true);
                 this.cameraActive = false;
                 videoVue.stopAcquisition(this.timer, this.capture, this.videoWriter);
                 System.out.println("error r & s values");
@@ -123,7 +126,12 @@ public class VideoController
                     Image imageToShow = videoVue.mat2Image(frame);
                     videoVue.updateImageView(currentFrame, imageToShow);
 
-                    cryptedFrame = videoCrypt.crypter(frame, values[0], values[1]);
+                    if(crypt.isSelected()) {
+                        cryptedFrame = videoCrypt.crypter(frame, values[0], values[1]);
+                    }
+                    else {
+                        cryptedFrame = videoCrypt.decrypter(frame, values[0], values[1]);
+                    }
                     imageToShow = videoVue.mat2Image(cryptedFrame);
                     videoVue.updateImageView(currentFrame2, imageToShow);
 
@@ -131,10 +139,11 @@ public class VideoController
                         videoWriter.write(cryptedFrame);
                     }
 
-//                    System.out.println(group.getSelectedToggle());
-                    frame = videoCrypt.decrypter(cryptedFrame, values[0], values[1]);
-                    imageToShow = videoVue.mat2Image(frame);
-                    videoVue.updateImageView(currentFrame3, imageToShow);
+                    if(buttonAction.getText().equals("Stop webcam")) {
+                        frame = videoCrypt.decrypter(cryptedFrame, values[0], values[1]);
+                        imageToShow = videoVue.mat2Image(frame);
+                        videoVue.updateImageView(currentFrame3, imageToShow);
+                    }
 
                     if(frame.empty()){
                         videoVue.stopAcquisition(timer, capture, videoWriter);
@@ -154,11 +163,12 @@ public class VideoController
     }
 
     /**
-     * Méthode appelée lorsqu'on clique sur le bouton "Démarrer la Webcam"
+     * Méthode appelée lorsqu'on clique sur le bouton "Demarrer la Webcam"
      */
     @FXML
     void toggleWebcam() {
-        buttonAction.setText("Démarrer la Webcam");
+        this.errorValues.setVisible(false);
+        buttonAction.setText("Demarrer la Webcam");
         vboxRadioButton.setVisible(false);
     }
 
@@ -167,6 +177,7 @@ public class VideoController
      */
     @FXML
     void toggleFile() {
+        this.errorValues.setVisible(false);
         buttonAction.setText("Parcourir");
         vboxRadioButton.setVisible(true);
     }
